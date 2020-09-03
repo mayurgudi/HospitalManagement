@@ -1,0 +1,418 @@
+using HospitalDB;
+using HospitalLogic;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Threading;
+
+namespace HospitalDB
+{
+    internal static class ManagePatient
+    {
+        internal static void Create(Patient p)      // only for first time
+        {
+            // add 
+        }
+
+        internal static Patient Read(string name, string phone)
+        {
+            // read from db and return json if present .... else return null
+            // if null then return this
+            return new Patient("","","", new List<Allergy>());
+            // else if json exists then deserialize and return object
+        }
+
+        internal static List<PatientLogs> ReadLogs(Patient p)
+        {
+            // Get all logs for a particular patient.
+            return new List<PatientLogs>();
+        }
+
+        internal static void Update(Patient p)      // multiple visits
+        {
+            // add extra log to existing  ( add this patient's log to log table referring to this patient
+        }
+
+        internal static void Delete(Patient p)
+        {
+            // delete
+        }
+
+        internal static string Query(string query)      // may change
+        {
+            // fire this query to get results in json format, convert to string and return that
+            return "";
+        }
+    }
+
+    internal static class ManageStaff         // adding to db
+    {
+        public static void Create(Staff x)
+        {
+            // repeat this in all methods
+            string className = x.GetType().Name;    // name of class // to get staff type
+            var u = x.GetType().GetFields();    // list of fields
+        }
+
+        internal static Staff Read(Staff x)
+        {
+            // read from db and return json if present .... else return null
+            // if null then return this
+            return Factory.CreateStaff(x.GetType().Name);
+            // else if json exists then deserialize using CLASSNAME and return object 
+            // removing all logs from this object
+        }
+
+        internal static void Update(Staff x)
+        {
+            
+        }
+
+        internal static void Delete(Staff x)
+        {
+            
+        }
+    }
+}
+
+namespace HospitalLogic
+{
+    public static class Factory
+    {
+        public static Staff CreateStaff(string s)
+        {
+            if (s.Equals("Doctor"))
+            {
+                return new Doctor();
+            }
+            else if (s.Equals("Nurse"))
+            {
+                return new Nurse();
+            }
+            else if (s.Equals("Wardboy"))
+            {
+                return new Wardboy();
+            }
+            else
+            {
+                return null;
+            }
+        }
+    }
+
+    public static class Admin
+    {
+        public static bool newPat;
+
+        public static List<Doctor> doctors;
+
+        public static Patient cPatient;
+
+        public static PatientLogs cLogs;
+
+        public static List<Nurse> nurses;
+
+        public static List<Wardboy> wardboys;
+
+        public static void FillUp()
+        { 
+            // database to the above lists
+        }
+
+        public static int Noofpat(Doctor d)
+        {
+            int count = 0;
+            return 100 * count;
+        }
+
+        public static Doctor GetFreeDoctor()
+        {
+            Doctor u = doctors.Where(x => x.isBusy == false).FirstOrDefault();
+            doctors.Remove(u);
+            u.isBusy = true;
+            u.cPatient = Admin.cPatient;
+            doctors.Add(u);
+            return u;
+        }
+
+        public static List<Nurse> GetNurses(int n)
+        {
+            int i = 0;
+            List<Nurse> temp = new List<Nurse>();
+            foreach (var nurse in nurses.OrderBy(x => x.tasks))
+            {
+                nurse.tasks++;
+                temp.Add(nurse);
+                i++;
+                if (i == n)
+                {
+                    break;
+                }
+            }
+            return temp;
+        }
+
+        public static List<Wardboy> GetWardboys(int n)
+        {
+            int i = 0;
+            List<Wardboy> temp = new List<Wardboy>();
+            foreach (var wardboy in wardboys.OrderBy(x => x.tasks))
+            {
+                wardboy.tasks++;
+                temp.Add(wardboy);
+                i++;
+                if (i == n)
+                {
+                    break;
+                }
+            }
+            return temp;
+        }
+
+        public static void CreateStaff(string name)
+        {
+            try
+            {
+                Factory.CreateStaff(name);
+            }
+            catch 
+            {
+                throw new InvalidStaffException(name);
+            }
+        }
+
+        /*
+        To add a patient
+        CreateNewPatient        
+        Then loop AddProblem
+        Then AddLog
+        */
+
+        public static void CreateNewPatient(string name, string phone, string address)
+        {
+            Patient p = ManagePatient.Read(name, phone);
+            if (p.name.Equals(""))
+            {
+                p.name = name;
+                p.phone = phone;
+                p.address = address;
+                newPat = true;
+            }
+            else
+            {
+                newPat = false;
+            }
+            cPatient = p;
+        }
+
+        public static void AddProblem(string name, string description, string noofdays)
+        {
+            Problem p = new Problem
+            {
+                description = description,
+                name = name,
+                timeperiod = noofdays
+            };
+            if (cLogs.Problems is null)
+            {
+                cLogs.Problems = new List<Problem>();
+            }
+            cLogs.Problems.Add(p);
+        }
+
+        public static void AddAllergy(string name, string description, string noofdays)
+        {
+            Allergy a = new Allergy(name, description, noofdays);
+            if (cPatient.allergies is null)
+            {
+                cPatient.allergies = new List<Allergy>();
+            }
+            cPatient.allergies.Add(a);
+        }
+        
+
+        public static void AddLog(int nurseCount, int wardboyCount)         // only once per visit
+        {
+            Doctor d = GetFreeDoctor();
+            List<Nurse> n = GetNurses(nurseCount);
+            List<Wardboy> w = GetWardboys(wardboyCount);
+            cLogs.Doctor = d;
+            cLogs.Nurses = n;
+            cLogs.Wardboys = w;
+            cLogs.VisitTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
+            if (cPatient.logs is null)
+            {
+                cPatient.logs = new List<PatientLogs>();
+            }
+            cPatient.logs.Add(cLogs);
+            if (newPat)
+            {
+                ManagePatient.Create(cPatient);
+            }
+            else
+            {
+                ManagePatient.Update(cPatient);
+            }
+            cPatient = new Patient();
+        }
+    }
+
+    [Serializable]
+    internal class InvalidStaffException : Exception
+    {
+        public InvalidStaffException(string message) : base(String.Format(" There is no such staff position called {0}", message)) { }
+    }
+
+    public abstract class Staff
+    {
+        public string name;
+        public string joiningDate;
+        public string department;
+
+        protected abstract int CalcSalary();
+    }
+
+    public class Doctor : Staff
+    {
+        public string Qualification;
+
+        public bool isBusy;
+
+        public Patient cPatient;
+
+        protected override int CalcSalary()
+        {
+            int x = Admin.Noofpat(this);
+            return x*1000;       
+        }
+
+        public void AddTreatment()             // pending
+        {
+            var res = from log in cPatient.logs orderby DateTime.Parse(log.VisitTime) select log;
+            PatientLogs x = res.First();
+            foreach (var item in x.Problems)
+            {
+                item.AddTreatment("", "");
+            }
+        }
+    }
+
+    public class Patient
+    {
+        [Required(ErrorMessage = "Name is required")]
+        public string name;
+
+        [Required(ErrorMessage = "Phone number is required")]
+        [RegularExpression("^[0-9]{10}$", ErrorMessage = " Phone number should be valid")]
+        public string phone;
+
+        public string address;
+        public List<Allergy> allergies;
+        public List<PatientLogs> logs;
+
+        public Patient(string n, string p, string add, List<Allergy> alle)
+        {
+            name = n;
+            phone = p;
+            address = add;
+            allergies = alle;
+        }
+
+        public Patient() { }
+    }
+
+    public class PatientLogs
+    {
+        public string VisitTime { get; set; }
+
+        public Doctor Doctor { get; set; }
+
+        public List<Problem> Problems { get; set; }
+
+        public List<Nurse> Nurses { get; set; }
+
+        public List<Wardboy> Wardboys { get; set; }
+    }
+
+    public class Problem
+    {
+        public string name;
+        public string description;
+        public string timeperiod;
+        public List<Treatment> list;
+
+        public void AddTreatment(string name, string description) 
+        {
+            list.Add(new Treatment(name, description));
+        }
+
+        public void RemoveTreatment(string name)
+        {
+            list.Remove(list.Where(x => x.Name.Equals(name)).FirstOrDefault());
+        }
+    }
+
+    public class Treatment
+    {
+        public string Name { get; set; }
+
+        public string Description { get; set; }
+
+        [Required(ErrorMessage = " Dosage is missing")]
+        public string Frequency { get; set; }
+
+        public Treatment(string n, string f)
+        {
+            Name = n;
+            Frequency = f;
+        }
+    }
+
+    public class Allergy
+    {
+        public string Name { get; set; }
+
+        [Required(ErrorMessage = " Description is must")]
+        public string Description { get; set; }
+
+        public string TimePeriod { get; set; }
+        
+        public Allergy(string name, string desc, string time)
+        {
+            Name = name;
+            Description = desc;
+            TimePeriod = time;
+        }
+    }
+
+    public class Nurse : Staff
+    {
+        public int tasks;
+
+        protected override int CalcSalary()
+        {
+            return 12000;
+        }
+
+        public void NurseTask()
+        {
+            Thread.Sleep(2500);     // random task
+        }
+    }
+
+    public class Wardboy : Staff
+    {
+        public int tasks;
+
+        protected override int CalcSalary()
+        {
+            return 9000;
+        }
+
+        public void WardboyTask()
+        {
+            Thread.Sleep(2000);       // random task
+        }
+    }
+}
