@@ -1,0 +1,15 @@
+<mat-sidenav-container class="example-container">
+    <mat-sidenav mode="side" opened class="example-sidenav">
+        <div style="padding-bottom: 10px;">
+            <a routerLink='Patient/Add'> Add Patient </a><br>
+        </div>
+        <div style="padding-bottom: 10px;">
+            <a routerLink='Patient/Display'> Display Patient </a><br>
+        </div>
+    </mat-sidenav>
+    <mat-sidenav-content>
+        <router-outlet>
+            
+        </router-outlet>
+    </mat-sidenav-content>
+</mat-sidenav-container>
