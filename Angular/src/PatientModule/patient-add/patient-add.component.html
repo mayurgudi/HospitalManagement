@@ -1,0 +1,85 @@
+  <div class="restbody" style="margin-top: 80px;">
+    <div>
+      <form name="entry" [formGroup]="formGroup">
+        <mat-form-field>
+          <mat-label>Enter Name</mat-label><br>
+          <input matInput type="text" formControlName="PName" name="Name" [(ngModel)]="cPatient.Name" /> 
+          <mat-error *ngIf="formGroup.controls['PName'].invalid">Invalid Phone Number</mat-error>
+        </mat-form-field>
+        <br>
+        <mat-form-field>
+          <mat-label>Enter Phone</mat-label><br>
+          <input matInput type="text" formControlName="PPhone" name="Phone" [(ngModel)]="cPatient.Phone" />
+          <mat-error *ngIf="formGroup.controls['PPhone'].invalid">Invalid Phone Number</mat-error>
+        </mat-form-field>
+        <br>
+        <mat-form-field>
+          <mat-label>Enter Address</mat-label><br>
+          <input matInput type="text" [ngModelOptions]="{standalone:true}" name="Address" [(ngModel)]="cPatient.Address" />
+        </mat-form-field>
+        <br>
+        <button (click)="AddPatient()" [disabled]="!formGroup.valid"> Add Patient</button><br><br>
+      </form>
+      <form [formGroup]="formGroup2">
+        <mat-form-field>
+          <mat-label>Enter Problem</mat-label><br>
+          <input matInput type="text" formControlName="PrName" name="Name" [(ngModel)]="cProblem.Name" /> <br><br>
+        </mat-form-field>
+        <br>
+        <mat-form-field>
+          <mat-label>Enter Description</mat-label><br>
+          <input matInput type="text" [ngModelOptions]="{standalone:true}" name="Description" [(ngModel)]="cProblem.Description" /> <br><br>
+        </mat-form-field>
+        <br>
+        <button (click)="AddProblem()" [disabled]="!formGroup2.valid"> Add Problem</button><br><br>
+      </form>
+      <form [formGroup]="formGroup3">
+        <mat-form-field>
+          <mat-label>Enter Treatment</mat-label><br>
+          <input matInput type="text" formControlName="TName" name="Name" [(ngModel)]="cTreatment.Name" /> 
+        </mat-form-field>
+        <br>
+        <mat-form-field>
+          <mat-label>Enter Dosage</mat-label><br>
+          <input matInput type="text" formControlName="TDosage" name="Dosage" [(ngModel)]="cTreatment.Dosage" />
+        </mat-form-field>
+        <br>
+        <button (click)="AddTreatment()" [disabled]="!formGroup3.valid"> Add Treatment</button><br><br>
+        <button (click)="AddToDatabase()" [disabled]="!formGroup.valid || !formGroup2.valid || !formGroup3.valid"> Save List to DB</button><br><br>
+      </form>
+      <!-- <table width="100%">
+        <tr>
+          <td width="14%">Name</td>
+          <td width="10%">Phone</td>
+          <td width="16%">Address</td>
+          <td width="12%">Problem</td>
+          <td width="18%">Description</td>
+          <td width="18%">Treatment</td>
+          <td width="12%">Dosage</td>
+        </tr>
+      </table>
+      <table width="100%">
+        <tr *ngFor="let i of Patients">
+          <td width="14%">{{ i.Name }}</td>
+          <td width="10%">{{ i.Phone }}</td>
+          <td width="16%">{{ i.Address }}</td>
+          <td width="60%">
+            <table width="100%" style="border: none;">
+              <tr *ngFor="let j of i.Problems">
+                <td width="20%">{{ j.Name }}</td>
+                <td width="30%">{{ j.Description }}</td>
+                <td width="50%">
+                  <table width="100%">
+                    <tr *ngFor="let k of j.Treatments">
+                      <td width="60%">{{ k.Name }}</td>
+                      <td width="40%">{{ k.Dosage }}</td>
+                    </tr>
+                  </table>      
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table> -->
+    </div>
+  </div>
