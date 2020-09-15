@@ -1,0 +1,8 @@
+<form name="entry" [formGroup]="formGroup">
+  <mat-form-field>
+    <mat-label>Enter your code</mat-label><br>
+    <input matInput type="text" formControlName="uname" name="Username" [(ngModel)]="username" /> 
+  </mat-form-field>
+  <br>
+  <button (click)="myLogin()">Login</button><br><br>
+</form>
