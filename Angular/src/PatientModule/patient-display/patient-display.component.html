@@ -1,0 +1,36 @@
+<br><br>
+<div>
+    List of all patients with their problems and treatments.
+    <table>
+        <tr>
+            <td>Name</td>
+            <td>Phone</td>
+            <td>Address</td>
+            <td>Problem</td>
+            <td>Description</td>
+            <td>Treatment</td>
+            <td>Dosage</td>
+        </tr>
+        <tr *ngFor = "let i of obj">
+            <td>{{ i.name }}</td>
+            <td>{{ i.phone }}</td>
+            <td>{{ i.address }}</td>
+            <td>
+                <table>
+                    <tr *ngFor = "let j of i.problems">
+                        <td>{{ j.name }}</td>
+                        <td>{{ j.description }}</td>
+                        <td>
+                            <table>
+                                <tr *ngFor = "let k of j.treatments">
+                                    <td>{{ k.name }}</td>
+                                    <td>{{ k.dosage }}</td>
+                                </tr>                   
+                            </table>
+                        </td>
+                    </tr>       
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>
